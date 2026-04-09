@@ -85,13 +85,12 @@ export default function Compare() {
         .select-arrow { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #FFCC00; font-size: 11px; pointer-events: none; }
       `}</style>
 
-
       {/* Header */}
       <div style={{ marginBottom:"2rem", position:"relative", zIndex:1 }}>
         <Link href="/" style={{ color:"#6B7280", fontSize:"0.85rem", fontFamily:"monospace", textDecoration:"none" }}>
           ← Back to test
         </Link>
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:"0.75rem" }}>
+        <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginTop:"0.75rem", flexWrap:"wrap", gap:"1rem" }}>
           <div>
             <h1 style={{ fontSize:"2rem", fontWeight:"800", margin:"0 0 0.25rem", letterSpacing:"-0.02em", color:"white" }}>
               Network <span style={{ color:"#FFCC00" }}>Compare</span>
@@ -102,12 +101,7 @@ export default function Compare() {
           </div>
           <button
             onClick={fetchData}
-            style={{
-              padding:"8px 16px", borderRadius:"999px",
-              border:"1px solid #2A2A2A", background:"transparent",
-              color:"#6B7280", fontSize:"0.8rem", fontFamily:"monospace",
-              cursor:"pointer", transition:"all 0.2s",
-            }}
+            style={{ padding:"10px 18px", borderRadius:"999px", border:"1px solid #2A2A2A", background:"transparent", color:"#6B7280", fontSize:"0.8rem", fontFamily:"monospace", cursor:"pointer", transition:"all 0.2s", whiteSpace:"nowrap" }}
             onMouseOver={e => { (e.target as HTMLElement).style.borderColor="#FFCC00"; (e.target as HTMLElement).style.color="#FFCC00"; }}
             onMouseOut={e => { (e.target as HTMLElement).style.borderColor="#2A2A2A"; (e.target as HTMLElement).style.color="#6B7280"; }}
           >
@@ -116,36 +110,44 @@ export default function Compare() {
         </div>
       </div>
 
-      {/* State Filter */}
-      <div style={{ marginBottom:"1rem", overflowX:"auto", display:"flex", gap:"8px", paddingBottom:"4px", position:"relative", zIndex:1 }}>
-        {STATES.map((s) => (
-          <button key={s} onClick={() => setState(s)} style={{
-            padding:"6px 14px", borderRadius:"999px", border:"1px solid",
-            borderColor: state===s ? "#FFCC00" : "#2A2A2A",
-            background: state===s ? "#FFCC0022" : "transparent",
-            color: state===s ? "#FFCC00" : "#6B7280",
-            fontSize:"0.8rem", fontFamily:"monospace",
-            cursor:"pointer", whiteSpace:"nowrap", transition:"all 0.2s ease",
-          }}>
-            {s}
-          </button>
-        ))}
-      </div>
+      {/* Filters Row */}
+      <div style={{ display:"flex", alignItems:"center", gap:"16px", marginBottom:"1.5rem", position:"relative", zIndex:1, flexWrap:"wrap" }}>
 
-      {/* Metric Selector */}
-      <div style={{ display:"flex", gap:"8px", marginBottom:"1.5rem", position:"relative", zIndex:1 }}>
-        {(Object.keys(metricLabels) as Metric[]).map((m) => (
-          <button key={m} onClick={() => setMetric(m)} style={{
-            padding:"6px 14px", borderRadius:"8px", border:"1px solid",
-            borderColor: metric===m ? "#FFCC00" : "#2A2A2A",
-            background: metric===m ? "#FFCC0022" : "transparent",
-            color: metric===m ? "#FFCC00" : "#6B7280",
-            fontSize:"0.8rem", fontFamily:"monospace",
-            cursor:"pointer", transition:"all 0.2s ease",
-          }}>
-            {m==="avg_download" ? "↓ Download" : m==="avg_upload" ? "↑ Upload" : "◎ Ping"}
-          </button>
-        ))}
+        {/* State Dropdown */}
+        <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
+          <p style={{ color:"#6B7280", fontSize:"0.8rem", fontFamily:"monospace", margin:0, whiteSpace:"nowrap" }}>
+            State:
+          </p>
+          <div className="select-wrap">
+            <select
+              className="state-select"
+              value={state}
+              onChange={(e) => setState(e.target.value)}
+            >
+              {STATES.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+            <span className="select-arrow">▼</span>
+          </div>
+        </div>
+
+        {/* Metric Selector */}
+        <div style={{ display:"flex", gap:"6px" }}>
+          {(Object.keys(metricLabels) as Metric[]).map((m) => (
+            <button key={m} onClick={() => setMetric(m)} style={{
+              padding:"8px 12px", borderRadius:"8px", border:"1px solid",
+              borderColor: metric===m ? "#FFCC00" : "#2A2A2A",
+              background: metric===m ? "#FFCC0022" : "transparent",
+              color: metric===m ? "#FFCC00" : "#6B7280",
+              fontSize:"0.75rem", fontFamily:"monospace",
+              cursor:"pointer", transition:"all 0.2s ease",
+              whiteSpace:"nowrap",
+            }}>
+              {m==="avg_download" ? "↓ Down" : m==="avg_upload" ? "↑ Up" : "◎ Ping"}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div style={{ position:"relative", zIndex:1 }}>
@@ -227,15 +229,6 @@ export default function Compare() {
                 </table>
               </div>
             </div>
-
-            {rankings.length === 0 && (
-              <div style={{ textAlign:"center", padding:"2rem" }}>
-                <p style={{ color:"#6B7280", fontFamily:"monospace" }}>No data yet for {state}.</p>
-                <Link href="/" style={{ display:"inline-block", marginTop:"1rem", padding:"8px 20px", borderRadius:"999px", background:"#FFCC0022", border:"1px solid #FFCC0044", color:"#FFCC00", fontSize:"0.85rem", fontFamily:"monospace", textDecoration:"none" }}>
-                  Run Test →
-                </Link>
-              </div>
-            )}
           </>
         )}
       </div>
