@@ -1,13 +1,13 @@
 import { SpeedTestResult } from "@/types";
 
-function generateRandomData(size: number): Uint8Array {
+function generateRandomData(size: number): ArrayBuffer {
   const data = new Uint8Array(size);
   const chunkSize = 65536;
   for (let i = 0; i < size; i += chunkSize) {
     const chunk = data.subarray(i, Math.min(i + chunkSize, size));
     crypto.getRandomValues(chunk);
   }
-  return data;
+  return data.buffer;
 }
 
 function getBaseUrl(): string {
@@ -40,7 +40,7 @@ async function measureUpload(): Promise<number> {
   try {
     await fetch(`${getBaseUrl()}/api/speedtest?type=up&t=${Date.now()}`, {
       method: "POST",
-      body: data,
+      body: data as BodyInit,
       cache: "no-store",
     });
     const duration = (performance.now() - start) / 1000;
