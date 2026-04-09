@@ -8,9 +8,15 @@ import { NETWORK_META } from "@/lib/networks";
 import NetworkGrid from "@/components/ui/NetworkGrid";
 
 const STATES = [
-  "All States", "Lagos", "Abuja", "Rivers", "Kano", "Oyo",
-  "Kaduna", "Delta", "Enugu", "Anambra", "Imo", "Ogun",
-  "Edo", "Kwara", "Plateau", "Cross River", "Akwa Ibom",
+  "All States",
+  "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi",
+  "Bayelsa", "Benue", "Borno", "Cross River", "Delta",
+  "Ebonyi", "Edo", "Ekiti", "Enugu", "Abuja (FCT)",
+  "Gombe", "Imo", "Jigawa", "Kaduna", "Kano",
+  "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos",
+  "Nasarawa", "Niger", "Ogun", "Ondo", "Osun",
+  "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba",
+  "Yobe", "Zamfara",
 ];
 
 const ALL_NETWORKS: NetworkProvider[] = ["MTN", "Airtel", "Glo", "9mobile"];
