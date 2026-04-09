@@ -37,6 +37,28 @@ export default function Rankings() {
     <main style={{ minHeight:"100vh", background:"#0A0A0A", padding:"6rem 1.5rem 2rem", maxWidth:"700px", margin:"0 auto", position:"relative" }}>
 
       <NetworkGrid accentColor="#FFCC00" />
+      
+      <style>{`
+        .state-select {
+          appearance: none;
+          background: #141414;
+          border: 1px solid #2A2A2A;
+          border-radius: 10px;
+          color: white;
+          font-size: 13px;
+          font-family: monospace;
+          padding: 10px 36px 10px 14px;
+          cursor: pointer;
+          outline: none;
+          min-width: 200px;
+          transition: border-color 0.2s;
+        }
+        .state-select:focus { border-color: #FFCC00; }
+        .state-select option { background: #141414; color: white; }
+        .select-wrap { position: relative; display: inline-block; }
+        .select-arrow { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #FFCC00; font-size: 11px; pointer-events: none; }
+      `}</style>
+
 
       {/* Header */}
       <div style={{ marginBottom:"2rem", position:"relative", zIndex:1 }}>
