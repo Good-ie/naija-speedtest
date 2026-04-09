@@ -10,50 +10,30 @@ function generateRandomData(size: number): ArrayBuffer {
   return data.buffer;
 }
 
-function getBaseUrl(): string {
-  if (typeof window !== "undefined") {
-    return window.location.origin;
-  }
-  return "";
-}
-
-// Measure real network ping using Navigation Timing API
-// This measures actual DNS + TCP connection time — not round trip to a far server
+// Measure ping directly to Cloudflare — bypasses Vercel completely
 async function measurePing(): Promise<{ ping: number; jitter: number }> {
   const samples: number[] = [];
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 6; i++) {
+    const start = performance.now();
     try {
-      const url = `${getBaseUrl()}/api/speedtest?type=ping&t=${Date.now()}`;
-      const start = performance.now();
-      await fetch(url, { cache: "no-store", method: "HEAD" });
-      const end = performance.now();
-
-      // Use Navigation Timing if available for more accurate measurement
-      const entries = performance.getEntriesByType("resource") as PerformanceResourceTiming[];
-      const entry = entries[entries.length - 1];
-
-      if (entry && entry.connectEnd && entry.connectStart && entry.connectEnd > entry.connectStart) {
-        // TCP connection time — most accurate measure of network latency
-        samples.push(entry.connectEnd - entry.connectStart);
-      } else if (entry && entry.responseStart && entry.requestStart) {
-        // Time to first byte — good fallback
-        samples.push(entry.responseStart - entry.requestStart);
-      } else {
-        // Basic round trip fallback
-        samples.push((end - start) / 2);
-      }
+      await fetch(
+        `https://speed.cloudflare.com/__down?bytes=0&t=${Date.now()}`,
+        { cache: "no-store", mode: "cors" }
+      );
+      samples.push(performance.now() - start);
     } catch {
       samples.push(999);
     }
   }
 
-  // Remove outliers — drop highest and lowest if we have enough samples
+  // Drop highest and lowest to remove outliers
   const sorted = [...samples].sort((a, b) => a - b);
-  const trimmed = sorted.length >= 4 ? sorted.slice(1, -1) : sorted;
+  const trimmed = sorted.slice(1, -1);
 
   const avg = trimmed.reduce((a, b) => a + b, 0) / trimmed.length;
-  const jitter = trimmed.reduce((acc, val) => acc + Math.abs(val - avg), 0) / trimmed.length;
+  const jitter =
+    trimmed.reduce((acc, val) => acc + Math.abs(val - avg), 0) / trimmed.length;
 
   return {
     ping: Math.round(avg),
@@ -61,13 +41,13 @@ async function measurePing(): Promise<{ ping: number; jitter: number }> {
   };
 }
 
-// Download via Cloudflare proxy for accurate measurement
+// Download directly from Cloudflare — bypasses Vercel completely
 async function measureDownload(): Promise<number> {
   const start = performance.now();
   try {
     const response = await fetch(
-      `${getBaseUrl()}/api/speedtest?type=down&bytes=10000000&t=${Date.now()}`,
-      { cache: "no-store" }
+      `https://speed.cloudflare.com/__down?bytes=10000000&t=${Date.now()}`,
+      { cache: "no-store", mode: "cors" }
     );
     const buffer = await response.arrayBuffer();
     const duration = (performance.now() - start) / 1000;
@@ -79,17 +59,21 @@ async function measureDownload(): Promise<number> {
   }
 }
 
-// Upload test — measures real upload to our server
+// Upload directly to Cloudflare — bypasses Vercel completely
 async function measureUpload(): Promise<number> {
   const SIZE = 2 * 1024 * 1024; // 2MB
   const data = generateRandomData(SIZE);
   const start = performance.now();
   try {
-    await fetch(`${getBaseUrl()}/api/speedtest?type=up&t=${Date.now()}`, {
-      method: "POST",
-      body: data as BodyInit,
-      cache: "no-store",
-    });
+    await fetch(
+      `https://speed.cloudflare.com/__up?t=${Date.now()}`,
+      {
+        method: "POST",
+        body: data as BodyInit,
+        cache: "no-store",
+        mode: "cors",
+      }
+    );
     const duration = (performance.now() - start) / 1000;
     return Math.round((SIZE * 8 / duration / 1_000_000) * 100) / 100;
   } catch (e) {
